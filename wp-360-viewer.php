@@ -40,11 +40,15 @@ function wp360_shortcode($atts) {
     ], $atts);
 
     $images = explode(',', $atts['images']);
+    $auto_spin = get_option('wp360_auto_spin', 0);
+    $spin_speed = get_option('wp360_speed', 80);
 
     ob_start(); ?>
 
     <div class="wp360-container"
-         data-images='<?php echo json_encode($images); ?>'>
+         data-images='<?php echo json_encode($images); ?>'
+         data-auto-spin='<?php echo $auto_spin; ?>'
+         data-spin-speed='<?php echo $spin_speed; ?>'>
         <p>360 Viewer Loading...</p>
     </div>
 
@@ -79,6 +83,13 @@ function wp360_settings_page() {
             ?>
 
             <label>
+                Auto Spin:
+                <input type="checkbox" name="wp360_auto_spin" value="1" <?php checked(1, get_option('wp360_auto_spin'), true); ?> />
+            </label>
+
+            <br><br>
+
+            <label>
                 Spin Speed:
                 <input type="number" name="wp360_speed" value="<?php echo get_option('wp360_speed', 80); ?>">
             </label>
@@ -90,5 +101,6 @@ function wp360_settings_page() {
 }
 
 add_action('admin_init', function () {
+    register_setting('wp360_settings_group', 'wp360_auto_spin');
     register_setting('wp360_settings_group', 'wp360_speed');
 });

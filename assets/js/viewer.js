@@ -5,9 +5,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const images = JSON.parse(container.dataset.images);
         if (!images || images.length === 0) return;
 
+        const autoSpin = container.dataset.autoSpin === '1';
+        const spinSpeed = parseInt(container.dataset.spinSpeed) || 80;
+
         let index = 0;
         let isDragging = false;
         let lastX = 0;
+        let moveDelta = 0;
 
         const img = document.createElement('img');
         img.src = images[0];
@@ -20,6 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         container.innerHTML = '';
         container.appendChild(img);
+
+        container.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
 
         // IMPORTANT: use container (stable target)
         container.style.touchAction = "none"; // prevents browser gesture interference
@@ -45,17 +53,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!isDragging) return;
 
             const diff = e.clientX - lastX;
+            moveDelta += diff;
+            lastX = e.clientX;
 
-            if (Math.abs(diff) > 5) {
+            const threshold = 6;
+            const rawSteps = Math.trunc(moveDelta / threshold);
+            const maxSteps = 3;
+            const steps = Math.sign(rawSteps) * Math.min(Math.abs(rawSteps), maxSteps);
 
-                if (diff > 0) {
-                    index = (index + 1) % images.length;
-                } else {
-                    index = (index - 1 + images.length) % images.length;
-                }
-
+            if (steps !== 0) {
+                moveDelta -= steps * threshold;
+                index = (index + steps + images.length * 1000) % images.length;
                 img.src = images[index];
-                lastX = e.clientX;
             }
         });
 
@@ -80,7 +89,24 @@ document.addEventListener('DOMContentLoaded', () => {
             isDragging = false;
         });
 
-        container.addEventListener('contextmenu', e => e.preventDefault());
+        container.addEventListener('mousedown', (e) => {
+            if (e.detail > 1) e.preventDefault();
+        });
+
+        function autoRotate() {
+            if (isDragging || !autoSpin) {
+                setTimeout(autoRotate, spinSpeed);
+                return;
+            }
+
+            index = (index + 1) % images.length;
+            img.src = images[index];
+            setTimeout(autoRotate, spinSpeed);
+        }
+
+        if (autoSpin) {
+            autoRotate();
+        }
 
     });
 

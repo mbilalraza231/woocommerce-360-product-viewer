@@ -4,10 +4,13 @@
     overflow: hidden;
     cursor: grab;
     touch-action: none;
+}
 
-    /* IMPORTANT: blocks context menu selection feel */
+.wp360-container,
+.wp360-container * {
     -webkit-user-select: none;
     user-select: none;
+    -ms-user-select: none;
 }
 
 .wp360-container img {
@@ -15,7 +18,6 @@
     height: 100%;
     object-fit: contain;
 
-    user-select: none;
     -webkit-user-drag: none;
     pointer-events: none;
 }
