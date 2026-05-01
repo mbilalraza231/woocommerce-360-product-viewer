@@ -28,6 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Block right-click drag rotation
             if (e.button === 2) return;
 
+            // force reset any stuck state
+            try {
+                container.releasePointerCapture(e.pointerId);
+            } catch (err) {}
+
             isDragging = true;
             lastX = e.clientX;
 
@@ -64,13 +69,26 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         container.addEventListener('pointerup', stop);
-        container.addEventListener('pointercancel', stop);
+        container.addEventListener('pointercancel', (e) => {
+            isDragging = false;
+            try {
+                container.releasePointerCapture(e.pointerId);
+            } catch (err) {}
+            container.style.cursor = "grab";
+        });
         container.addEventListener('lostpointercapture', () => {
             isDragging = false;
         });
 
         container.addEventListener('contextmenu', e => e.preventDefault());
 
+    });
+
+    // Global safety reset for focus loss
+    window.addEventListener('blur', () => {
+        document.querySelectorAll('.wp360-container').forEach(container => {
+            container.style.cursor = "grab";
+        });
     });
 
 });
