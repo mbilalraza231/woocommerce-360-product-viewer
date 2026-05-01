@@ -66,6 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
             isDragging = false;
         });
 
+        container.addEventListener('contextmenu', e => e.preventDefault());
+
     });
 
 });
