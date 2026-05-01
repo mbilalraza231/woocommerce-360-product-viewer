@@ -6,7 +6,6 @@
 }
 
 .wp360-container img {
-    width: 100%;
     user-select: none;
-    pointer-events: none;
+    -webkit-user-drag: none;
 }

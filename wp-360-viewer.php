@@ -50,3 +50,5 @@ function wp360_shortcode($atts) {
 
     <?php return ob_get_clean();
 }
+
+add_shortcode('wp360', 'wp360_shortcode');

@@ -1,53 +1,44 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const containers = document.querySelectorAll('.wp360-container');
 
-    containers.forEach(container => {
-        const imagesJson = container.getAttribute('data-images');
-        const images = JSON.parse(imagesJson);
+    document.querySelectorAll('.wp360-container').forEach(container => {
 
-        if (!images || images.length === 0) {
-            container.innerHTML = '<p>No images provided</p>';
-            return;
-        }
+        const images = JSON.parse(container.dataset.images);
+        if (!images || images.length === 0) return;
 
-        // Create and configure image element
-        const img = document.createElement('img');
-        img.src = images[0];
-        img.alt = '360 Viewer';
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'contain';
-        img.draggable = false;
-
-        // Clear container and add image
-        container.innerHTML = '';
-        container.appendChild(img);
-
-        // Initialize variables
         let index = 0;
         let isDragging = false;
         let lastX = 0;
 
-        // Prevent native drag
-        img.addEventListener('dragstart', e => e.preventDefault());
+        const img = document.createElement('img');
+        img.src = images[0];
+        img.alt = '360 Viewer';
+        img.draggable = false;
 
-        // START
-        img.addEventListener('pointerdown', (e) => {
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.objectFit = "contain";
+
+        container.innerHTML = '';
+        container.appendChild(img);
+
+        // IMPORTANT: use container (stable target)
+        container.style.touchAction = "none"; // prevents browser gesture interference
+
+        container.addEventListener('pointerdown', (e) => {
             isDragging = true;
             lastX = e.clientX;
 
-            img.setPointerCapture(e.pointerId);
-            img.style.cursor = "grabbing";
+            container.setPointerCapture(e.pointerId);
+            container.style.cursor = "grabbing";
         });
 
-        // MOVE
-        img.addEventListener('pointermove', (e) => {
+        container.addEventListener('pointermove', (e) => {
 
             if (!isDragging) return;
 
             const diff = e.clientX - lastX;
 
-            if (Math.abs(diff) > 6) {
+            if (Math.abs(diff) > 5) {
 
                 if (diff > 0) {
                     index = (index + 1) % images.length;
@@ -60,17 +51,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // STOP
         const stop = (e) => {
             isDragging = false;
-            img.style.cursor = "grab";
+            container.style.cursor = "grab";
 
             try {
-                img.releasePointerCapture(e.pointerId);
+                container.releasePointerCapture(e.pointerId);
             } catch (err) {}
         };
 
-        img.addEventListener('pointerup', stop);
-        img.addEventListener('pointercancel', stop);
+        container.addEventListener('pointerup', stop);
+        container.addEventListener('pointercancel', stop);
+        container.addEventListener('lostpointercapture', () => {
+            isDragging = false;
+        });
+
     });
+
 });
