@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
         container.style.touchAction = "none"; // prevents browser gesture interference
 
         container.addEventListener('pointerdown', (e) => {
+            // Block right-click drag rotation
+            if (e.button === 2) return;
+
             isDragging = true;
             lastX = e.clientX;
 
