@@ -79,13 +79,6 @@ function wp360_settings_page() {
             ?>
 
             <label>
-                Auto Spin:
-                <input type="checkbox" name="wp360_auto_spin" value="1" <?php checked(1, get_option('wp360_auto_spin'), true); ?> />
-            </label>
-
-            <br><br>
-
-            <label>
                 Spin Speed:
                 <input type="number" name="wp360_speed" value="<?php echo get_option('wp360_speed', 80); ?>">
             </label>
@@ -97,6 +90,5 @@ function wp360_settings_page() {
 }
 
 add_action('admin_init', function () {
-    register_setting('wp360_settings_group', 'wp360_auto_spin');
     register_setting('wp360_settings_group', 'wp360_speed');
 });
