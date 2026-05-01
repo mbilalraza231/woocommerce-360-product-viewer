@@ -3,9 +3,11 @@
     height: 400px;
     overflow: hidden;
     cursor: grab;
-
-    /* IMPORTANT for mobile + pointer stability */
     touch-action: none;
+
+    /* IMPORTANT: blocks context menu selection feel */
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .wp360-container img {
@@ -15,4 +17,5 @@
 
     user-select: none;
     -webkit-user-drag: none;
+    pointer-events: none;
 }
