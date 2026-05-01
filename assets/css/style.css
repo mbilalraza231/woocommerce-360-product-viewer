@@ -3,9 +3,16 @@
     height: 400px;
     overflow: hidden;
     cursor: grab;
+
+    /* IMPORTANT for mobile + pointer stability */
+    touch-action: none;
 }
 
 .wp360-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+
     user-select: none;
     -webkit-user-drag: none;
 }
