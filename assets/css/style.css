@@ -1,0 +1,12 @@
+.wp360-container {
+    width: 400px;
+    height: 400px;
+    overflow: hidden;
+    cursor: grab;
+}
+
+.wp360-container img {
+    width: 100%;
+    user-select: none;
+    pointer-events: none;
+}
