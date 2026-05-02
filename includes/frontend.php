@@ -15,6 +15,21 @@ function wp360_load_assets()
         'wp360-css',
         plugin_dir_url(dirname(__FILE__)) . 'assets/css/style.css'
     );
+
+    // 🔥 PASS SETTINGS TO JS
+    wp_localize_script('wp360-js', 'wp360Settings', [
+        'autoSpin' => (int) get_option('wp360_auto_spin', 0),
+        'dragRotation' => (int) get_option('wp360_drag_rotation', 1),
+        'speed'    => (int) get_option('wp360_speed', 80),
+
+        // NEW
+        'zoomEnable' => (int) get_option('wp360_zoom_enable', 1),
+        'zoomOnHover' => (int) get_option('wp360_zoom_on_hover', 1),
+        'zoomLevel'  => (float) get_option('wp360_zoom_level', 1.5),
+        'inertia'    => (float) get_option('wp360_inertia', 0.92),
+        'hotspots'   => (int) get_option('wp360_hotspots', 0),
+        'showControls' => (int) get_option('wp360_show_controls', 1),
+    ]);
 }
 add_action('wp_enqueue_scripts', 'wp360_load_assets');
 
@@ -46,3 +61,17 @@ function wp360_shortcode($atts) {
 }
 
 add_shortcode('wp360', 'wp360_shortcode');
+
+// WooCommerce Integration
+add_action('woocommerce_before_single_product_summary', 'wp360_show_on_product', 20);
+
+function wp360_show_on_product() {
+
+    global $product;
+
+    $images = get_post_meta($product->get_id(), 'wp360_images', true);
+
+    if (!$images) return;
+
+    echo do_shortcode('[wp360 images="' . esc_attr($images) . '"]');
+}
