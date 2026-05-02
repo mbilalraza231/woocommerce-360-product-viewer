@@ -5,6 +5,7 @@
     cursor: grab;
     touch-action: none;
     position: relative;
+    background: #fdfdfd;
 }
 
 .wp360-container,
@@ -21,68 +22,71 @@
     display: block;
     transform-origin: center center;
     transform: scale(1);
-
     -webkit-user-drag: none;
     pointer-events: none;
     transition: transform 0.25s ease;
 }
 
-/* UI Controls Styling */
+.wp360-zoomed img {
+    cursor: zoom-out;
+}
+
+/* UI Controls Styling - Compact Top-Right Corner */
 .wp360-controls {
     position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 12px;
+    right: 12px;
     display: flex;
-    gap: 12px;
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 10px 20px;
-    border-radius: 50px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    flex-direction: row;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     z-index: 999;
     pointer-events: auto;
 }
 
 .wp360-btn {
     background: #ffffff;
-    border: 1px solid #ddd;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
+    border: 1px solid #e0e0e0;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #000000;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: #333333;
+    transition: all 0.2s ease;
 }
 
 .wp360-btn:hover {
-    background: #f8f8f8;
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-    border-color: #bbb;
+    background: #f0f0f0;
+    border-color: #ccc;
+    color: #000;
 }
 
 .wp360-btn:active {
-    transform: translateY(0) scale(0.95);
+    transform: scale(0.92);
 }
 
 .wp360-btn.active {
-    background: #0073aa;
+    background: #2271b1;
     color: white;
-    border-color: #005177;
+    border-color: #135e96;
+}
+
+.wp360-btn svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+    fill: currentColor;
 }
 
 .wp360-btn.active svg {
     fill: white !important;
-}
-
-.wp360-btn svg {
-    display: block;
-    pointer-events: none;
 }

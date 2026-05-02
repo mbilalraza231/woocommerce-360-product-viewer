@@ -23,18 +23,24 @@ document.addEventListener('DOMContentLoaded', () => {
             showControls: parseInt(globalSettings.showControls !== undefined ? globalSettings.showControls : 1)
         };
 
+        // Interaction Override: If buttons are enabled, disable image hover/click zoom
+        if (settings.showControls === 1) {
+            settings.zoomOnHover = 0;
+            settings.zoomOnClick = 0;
+        }
+
         const images = JSON.parse(container.dataset.images || '[]');
         if (!images || images.length === 0) return;
 
         let index = 0;
         let isDragging = false;
         let isMouseOver = false;
-        let isZoomActive = false; 
-        
+        let isZoomActive = false;
+
         let lastX = 0;
         let lastY = 0;
         let moveDelta = 0;
-        
+
         let velocity = 0;
         let lastMoveTime = 0;
         let rafId = null;
@@ -70,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const setZoom = (active) => {
             if (settings.zoomEnable !== 1 || isDragging) return;
             isZoomActive = active;
-            
+
             if (active) {
                 container.classList.add('wp360-zoomed');
                 img.style.transform = `scale(${settings.zoomLevel})`;
@@ -126,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         container.addEventListener('contextmenu', (e) => e.preventDefault());
-        container.style.touchAction = "none"; 
+        container.style.touchAction = "none";
 
         const handleMove = (e) => {
             if (isDragging) {
@@ -152,9 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let startX = 0;
         let startY = 0;
         const handleDown = (e) => {
-            if (e.target.closest('.wp360-btn')) return; 
+            if (e.target.closest('.wp360-btn')) return;
             cancelAnimationFrame(rafId);
-            
+
             startX = e.clientX;
             startY = e.clientY;
             lastX_drag = e.clientX;
@@ -165,17 +171,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 isDragging = true;
                 if (container.setPointerCapture) container.setPointerCapture(e.pointerId);
                 updateCursor();
-                setZoom(false); 
+                setZoom(false);
             }
         };
 
         const handleUp = (e) => {
             const dist = Math.sqrt(Math.pow(e.clientX - startX, 2) + Math.pow(e.clientY - startY, 2));
-            
+
             if (isDragging) {
                 isDragging = false;
-                if (container.releasePointerCapture) { try { container.releasePointerCapture(e.pointerId); } catch(err) {} }
-                
+                if (container.releasePointerCapture) { try { container.releasePointerCapture(e.pointerId); } catch (err) { } }
+
                 if (dist < 5 && settings.zoomEnable === 1 && settings.zoomOnClick === 1) {
                     toggleZoom(e);
                 } else {
@@ -210,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.addEventListener('pointermove', handleMove);
         container.addEventListener('pointerup', handleUp);
         container.addEventListener('pointercancel', handleUp);
-        
+
         container.addEventListener('mouseenter', (e) => {
             isMouseOver = true;
             if (settings.zoomOnHover === 1) {
