@@ -1,6 +1,6 @@
 /**
  * WP 360 Viewer Logic
- * Professional Version 1.3 - Click vs Drag Solved
+ * Professional Version 1.6 - Unified Zoom Behavior & Cursors
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!containers.length) return;
 
     containers.forEach(container => {
-        // Fetch settings
         const globalSettings = window.wp360Settings || {};
         const settings = {
             autoSpin: parseInt(globalSettings.autoSpin || 0),
@@ -17,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
             speed: parseInt(globalSettings.speed || 80),
             zoomEnable: parseInt(globalSettings.zoomEnable !== undefined ? globalSettings.zoomEnable : 1),
             zoomOnHover: parseInt(globalSettings.zoomOnHover !== undefined ? globalSettings.zoomOnHover : 1),
+            zoomOnClick: parseInt(globalSettings.zoomOnClick !== undefined ? globalSettings.zoomOnClick : 1),
             zoomLevel: parseFloat(globalSettings.zoomLevel || 1.5),
             inertia: parseFloat(globalSettings.inertia !== undefined ? globalSettings.inertia : 0.92),
             hotspots: parseInt(globalSettings.hotspots || 0),
@@ -40,14 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
         let rafId = null;
 
         const img = document.createElement('img');
-        img.src = images[0];
+        img.src = images[index];
         img.draggable = false;
         img.className = 'wp360-main-img';
 
         Object.assign(img.style, {
             width: "100%", height: "100%", objectFit: "contain", display: "block",
             transformOrigin: "center center", transform: "scale(1)",
-            transition: "transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1)",
+            transition: "transform 0.25s ease-out",
             pointerEvents: "none"
         });
 
@@ -59,31 +59,50 @@ document.addEventListener('DOMContentLoaded', () => {
             img.src = images[index];
         };
 
-        const setZoom = (active, x = null, y = null) => {
+        const updateZoomOrigin = (x, y) => {
+            if (settings.zoomEnable !== 1 || isDragging) return;
+            const rect = container.getBoundingClientRect();
+            const xPct = ((x - rect.left) / rect.width) * 100;
+            const yPct = ((y - rect.top) / rect.height) * 100;
+            img.style.transformOrigin = `${xPct}% ${yPct}%`;
+        };
+
+        const setZoom = (active) => {
             if (settings.zoomEnable !== 1 || isDragging) return;
             isZoomActive = active;
-
+            
             if (active) {
                 container.classList.add('wp360-zoomed');
                 img.style.transform = `scale(${settings.zoomLevel})`;
-                if (x !== null && y !== null) {
-                    const rect = container.getBoundingClientRect();
-                    const xPct = ((x - rect.left) / rect.width) * 100;
-                    const yPct = ((y - rect.top) / rect.height) * 100;
-                    img.style.transformOrigin = `${xPct}% ${yPct}%`;
-                }
+                container.style.cursor = 'zoom-out';
             } else {
                 container.classList.remove('wp360-zoomed');
                 img.style.transform = "scale(1)";
-                setTimeout(() => { if(!isZoomActive) img.style.transformOrigin = "center center"; }, 400);
+                updateCursor();
+            }
+
+            // Sync with button UI
+            const btn = container.querySelector('.wp360-btn.zoom-toggle');
+            if (btn) btn.classList.toggle('active', active);
+        };
+
+        const updateCursor = () => {
+            if (isDragging) {
+                container.style.cursor = 'grabbing';
+            } else if (isZoomActive) {
+                container.style.cursor = 'zoom-out';
+            } else if (settings.zoomEnable === 1 && (settings.zoomOnHover === 1 || settings.zoomOnClick === 1)) {
+                container.style.cursor = 'zoom-in';
+            } else {
+                container.style.cursor = 'grab';
             }
         };
 
         const toggleZoom = (e) => {
+            if (settings.zoomEnable !== 1) return;
             const newState = !isZoomActive;
-            setZoom(newState, e.clientX, e.clientY);
-            const btn = container.querySelector('.wp360-btn.zoom-toggle');
-            if (btn) btn.classList.toggle('active', newState);
+            if (newState) updateZoomOrigin(e.clientX, e.clientY);
+            setZoom(newState);
         };
 
         if (settings.showControls === 1) {
@@ -124,13 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            lastX = e.clientX;
-            lastY = e.clientY;
-
             if (isMouseOver) {
-                if (settings.zoomOnHover === 1 || isZoomActive) {
-                    setZoom(true, e.clientX, e.clientY);
-                }
+                updateZoomOrigin(e.clientX, e.clientY);
             }
         };
 
@@ -150,8 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (settings.dragRotation === 1) {
                 isDragging = true;
                 if (container.setPointerCapture) container.setPointerCapture(e.pointerId);
-                container.style.cursor = "grabbing";
-                // We don't setZoom(false) here yet, we wait to see if they move
+                updateCursor();
+                setZoom(false); 
             }
         };
 
@@ -160,20 +174,19 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (isDragging) {
                 isDragging = false;
-                container.style.cursor = (settings.zoomEnable === 1) ? "zoom-in" : "grab";
                 if (container.releasePointerCapture) { try { container.releasePointerCapture(e.pointerId); } catch(err) {} }
                 
-                // If they BARELY moved, treat it as a click instead of a drag release
-                if (dist < 5 && settings.zoomEnable === 1) {
+                if (dist < 5 && settings.zoomEnable === 1 && settings.zoomOnClick === 1) {
                     toggleZoom(e);
                 } else {
-                    // It was a real drag, restore zoom if needed
-                    if (isMouseOver && (settings.zoomOnHover === 1 || isZoomActive)) {
-                        setZoom(true, e.clientX, e.clientY);
+                    if (isMouseOver && settings.zoomOnHover === 1) {
+                        updateZoomOrigin(e.clientX, e.clientY);
+                        setZoom(true);
                     }
+                    updateCursor();
                     startInertia();
                 }
-            } else if (dist < 5 && settings.zoomEnable === 1) {
+            } else if (dist < 5 && settings.zoomEnable === 1 && settings.zoomOnClick === 1) {
                 toggleZoom(e);
             }
         };
@@ -200,13 +213,17 @@ document.addEventListener('DOMContentLoaded', () => {
         
         container.addEventListener('mouseenter', (e) => {
             isMouseOver = true;
-            if (settings.zoomOnHover === 1 || isZoomActive) setZoom(true, e.clientX, e.clientY);
+            if (settings.zoomOnHover === 1) {
+                updateZoomOrigin(e.clientX, e.clientY);
+                setZoom(true);
+            }
+            updateCursor();
         });
 
         container.addEventListener('mouseleave', () => {
             isMouseOver = false;
-            if (!isZoomActive) setZoom(false);
-            if (!isDragging) container.style.cursor = settings.zoomEnable === 1 ? "zoom-in" : "grab";
+            setZoom(false); // ALWAYS unzoom when mouse leaves
+            updateCursor();
         });
 
         const runAutoRotate = () => {
@@ -216,5 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(runAutoRotate, settings.speed);
         };
         runAutoRotate();
+        updateCursor();
     });
 });

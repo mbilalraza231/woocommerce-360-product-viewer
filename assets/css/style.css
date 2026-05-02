@@ -27,12 +27,6 @@
     transition: transform 0.25s ease;
 }
 
-.wp360-zoomed img {
-    cursor: zoom-out;
-    box-shadow: 0 0 50px rgba(0,0,0,0.1);
-}
-
-
 /* UI Controls Styling */
 .wp360-controls {
     position: absolute;

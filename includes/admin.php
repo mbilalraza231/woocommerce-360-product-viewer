@@ -52,21 +52,27 @@ function wp360_settings_page() {
         <h2>3. Zoom Settings</h2>
 
         <div class="wp360-setting-row">
-            <label for="wp360_zoom_enable">Enable Zoom</label>
+            <label for="wp360_zoom_enable">Enable Zoom Feature</label>
             <input type="checkbox" id="wp360_zoom_enable" name="wp360_zoom_enable" value="1" <?php checked(1, get_option('wp360_zoom_enable', 1), true); ?>>
-            <span class="wp360-desc">Allow users to magnify the product.</span>
+            <span class="wp360-desc">Master switch to allow product magnification.</span>
         </div>
 
         <div class="wp360-setting-row">
-            <label for="wp360_zoom_on_hover">Trigger Zoom on Hover</label>
+            <label for="wp360_zoom_on_hover">Enable Zoom on Hover</label>
             <input type="checkbox" id="wp360_zoom_on_hover" name="wp360_zoom_on_hover" value="1" <?php checked(1, get_option('wp360_zoom_on_hover', 1), true); ?>>
-            <span class="wp360-desc">If disabled, users must click the Zoom Button to magnify.</span>
+            <span class="wp360-desc">Magnify the product automatically when the mouse enters the area.</span>
         </div>
 
         <div class="wp360-setting-row">
-            <label for="wp360_zoom_level">Zoom Magnification</label>
+            <label for="wp360_zoom_on_click">Enable Zoom on Click</label>
+            <input type="checkbox" id="wp360_zoom_on_click" name="wp360_zoom_on_click" value="1" <?php checked(1, get_option('wp360_zoom_on_click', 1), true); ?>>
+            <span class="wp360-desc">Toggle zoom manually by clicking the product image.</span>
+        </div>
+
+        <div class="wp360-setting-row">
+            <label for="wp360_zoom_level">Zoom Magnification Level</label>
             <input type="number" step="0.1" min="1" id="wp360_zoom_level" name="wp360_zoom_level" value="<?php echo get_option('wp360_zoom_level', 1.5); ?>">
-            <span class="wp360-desc">How much the image scales (e.g., 1.5x, 2.0x).</span>
+            <span class="wp360-desc">How much the image scales (e.g., 1.5 for 150%, 2.0 for 200%).</span>
         </div>
 
         <h2>4. Features & UI</h2>
@@ -109,6 +115,7 @@ add_action('admin_init', function () {
     register_setting('wp360_settings_group', 'wp360_show_controls');
     register_setting('wp360_settings_group', 'wp360_zoom_enable');
     register_setting('wp360_settings_group', 'wp360_zoom_on_hover');
+    register_setting('wp360_settings_group', 'wp360_zoom_on_click');
     register_setting('wp360_settings_group', 'wp360_zoom_level');
     register_setting('wp360_settings_group', 'wp360_inertia');
     register_setting('wp360_settings_group', 'wp360_hotspots');

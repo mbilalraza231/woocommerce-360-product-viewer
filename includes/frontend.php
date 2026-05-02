@@ -25,6 +25,7 @@ function wp360_load_assets()
         // NEW
         'zoomEnable' => (int) get_option('wp360_zoom_enable', 1),
         'zoomOnHover' => (int) get_option('wp360_zoom_on_hover', 1),
+        'zoomOnClick' => (int) get_option('wp360_zoom_on_click', 1),
         'zoomLevel'  => (float) get_option('wp360_zoom_level', 1.5),
         'inertia'    => (float) get_option('wp360_inertia', 0.92),
         'hotspots'   => (int) get_option('wp360_hotspots', 0),
