@@ -1,5 +1,5 @@
 # 📸 WP 360 Viewer
-**A Premium, High-Performance 360° Product Rotation Plugin for WordPress**
+**A Premium, High-Performance 360° Product Rotation Plugin for WordPress and Woocommerce**
 
 WP 360 Viewer is a lightweight yet powerful solution for showcasing products from every angle. Built with modern JavaScript and professional-grade interaction patterns, it offers a seamless experience for e-commerce and portfolio websites.
 
