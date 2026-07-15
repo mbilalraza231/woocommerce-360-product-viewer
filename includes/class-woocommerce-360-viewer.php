@@ -115,7 +115,7 @@ class Woocommerce_360_Viewer {
 		/**
 		 * Admin — admin area hooks and UI.
 		 */
-		require_once $plugin_path . 'admin/class-woocommerce-360-viewer-admin.php';
+		require_once $plugin_path . 'includes/admin/class-woocommerce-360-viewer-admin.php';
 
 		/**
 		 * Frontend — public-facing asset enqueues.

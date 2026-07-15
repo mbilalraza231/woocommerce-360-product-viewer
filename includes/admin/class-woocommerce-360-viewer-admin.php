@@ -114,7 +114,7 @@ class Woocommerce_360_Viewer_Admin {
 	 * @since    1.0.0
 	 */
 	public function display_plugin_settings_page() {
-		require_once WP360_PLUGIN_DIR . 'admin/partials/woocommerce-360-viewer-admin-display.php';
+		require_once WP360_PLUGIN_DIR . 'templates/admin-settings-template.php';
 	}
 
 }
