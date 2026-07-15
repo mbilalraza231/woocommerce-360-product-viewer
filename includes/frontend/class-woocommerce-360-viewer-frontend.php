@@ -72,7 +72,7 @@ class Woocommerce_360_Viewer_Frontend {
 		wp_enqueue_script(
 			$this->plugin_name,
 			WP360_PLUGIN_URL . 'js/viewer.js',
-			array( 'jquery' ),
+			array(),
 			$this->version,
 			false
 		);

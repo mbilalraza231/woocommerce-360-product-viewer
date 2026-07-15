@@ -84,7 +84,7 @@ class Woocommerce_360_Viewer_Admin {
 		wp_enqueue_script(
 			$this->plugin_name . '-admin',
 			WP360_PLUGIN_URL . 'js/woocommerce-360-viewer-admin.js',
-			array( 'jquery' ),
+			array(),
 			$this->version,
 			false
 		);
