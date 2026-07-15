@@ -59,15 +59,10 @@ register_activation_hook( __FILE__, 'activate_woocommerce_360_viewer' );
 register_deactivation_hook( __FILE__, 'deactivate_woocommerce_360_viewer' );
 
 /**
- * Load the Config class first — it provides constants to every other class.
+ * Load the Autoloader.
+ * This will automatically find and load all classes (Config, Orchestrator, etc.)
  */
-require WP360_PLUGIN_DIR . 'includes/config/class-woocommerce-360-viewer-config.php';
-
-/**
- * The core plugin class that is used to define internationalization,
- * admin-specific hooks, and public-facing site hooks.
- */
-require WP360_PLUGIN_DIR . 'includes/class-woocommerce-360-viewer.php';
+require WP360_PLUGIN_DIR . 'autoload.php';
 
 /**
  * Begins execution of the plugin.

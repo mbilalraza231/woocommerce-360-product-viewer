@@ -58,83 +58,16 @@ class Woocommerce_360_Viewer {
 		$this->plugin_name = Woocommerce_360_Viewer_Config::PLUGIN_NAME;
 		$this->version     = Woocommerce_360_Viewer_Config::PLUGIN_VERSION;
 
-		$this->load_dependencies();
+		$this->loader = new Woocommerce_360_Viewer_Loader();
+
+
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 
 	}
 
-	/**
-	 * Load the required dependencies for this plugin.
-	 *
-	 * Include the following files that make up the plugin:
-	 *
-	 * - Config:       Central constants.
-	 * - Loader:       Orchestrates the hooks of the plugin.
-	 * - i18n:         Defines internationalization functionality.
-	 * - Log:          Debug and error logging utility.
-	 * - Settings:     Handles plugin settings registration.
-	 * - Admin:        Defines all hooks for the admin area.
-	 * - Frontend:     Defines all hooks for the public side of the site.
-	 * - Shortcode:    Handles the [wp360] shortcode.
-	 * - ProductDetail: Handles WooCommerce single product page integration.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 */
-	private function load_dependencies() {
 
-		$plugin_path = plugin_dir_path( dirname( __FILE__ ) );
-
-		/**
-		 * Config — central constants.
-		 */
-		require_once $plugin_path . 'includes/config/class-woocommerce-360-viewer-config.php';
-
-		/**
-		 * Helper — hook loader.
-		 */
-		require_once $plugin_path . 'includes/helper/class-woocommerce-360-viewer-loader.php';
-
-		/**
-		 * Helper — debug/error logger.
-		 */
-		require_once $plugin_path . 'includes/helper/class-woocommerce-360-viewer-log.php';
-
-		/**
-		 * Core — internationalization.
-		 */
-		require_once $plugin_path . 'includes/core/class-woocommerce-360-viewer-i18n.php';
-
-		/**
-		 * Admin — settings registration.
-		 */
-		require_once $plugin_path . 'includes/admin/class-woocommerce-360-viewer-settings.php';
-
-		/**
-		 * Admin — admin area hooks and UI.
-		 */
-		require_once $plugin_path . 'includes/admin/class-woocommerce-360-viewer-admin.php';
-
-		/**
-		 * Frontend — public-facing asset enqueues.
-		 */
-		require_once $plugin_path . 'includes/frontend/class-woocommerce-360-viewer-frontend.php';
-
-		/**
-		 * Frontend — shortcode rendering.
-		 */
-		require_once $plugin_path . 'includes/frontend/class-woocommerce-360-viewer-shortcode.php';
-
-		/**
-		 * Frontend — WooCommerce product page integration.
-		 */
-		require_once $plugin_path . 'includes/frontend/class-woocommerce-360-viewer-product-detail.php';
-
-		$this->loader = new Woocommerce_360_Viewer_Loader();
-
-	}
 
 	/**
 	 * Define the locale for this plugin for internationalization.
