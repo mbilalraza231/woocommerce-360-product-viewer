@@ -79,7 +79,14 @@ class Woocommerce_360_Viewer_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts( $hook ) {
+
+		if ( 'post.php' === $hook || 'post-new.php' === $hook ) {
+			global $post;
+			if ( $post && 'product' === $post->post_type ) {
+				wp_enqueue_media();
+			}
+		}
 
 		wp_enqueue_script(
 			$this->plugin_name . '-admin',
@@ -115,6 +122,62 @@ class Woocommerce_360_Viewer_Admin {
 	 */
 	public function display_plugin_settings_page() {
 		require_once WP360_PLUGIN_DIR . 'templates/admin-settings-template.php';
+	}
+
+	/**
+	 * Register the meta box for WooCommerce products.
+	 *
+	 * @since    1.0.0
+	 */
+	public function add_meta_boxes() {
+		add_meta_box(
+			'wp360_images_meta_box',
+			'360 Product Viewer Images',
+			array( $this, 'display_meta_box' ),
+			'product',
+			'normal',
+			'high'
+		);
+	}
+
+	/**
+	 * Display the meta box HTML.
+	 *
+	 * @since    1.0.0
+	 * @param    WP_Post    $post    The current post object.
+	 */
+	public function display_meta_box( $post ) {
+		// Include the template for the meta box.
+		require_once WP360_PLUGIN_DIR . 'templates/admin-meta-box-template.php';
+	}
+
+	/**
+	 * Save the meta box data.
+	 *
+	 * @since    1.0.0
+	 * @param    int    $post_id    The ID of the current post.
+	 */
+	public function save_meta_box( $post_id ) {
+		// Check nonce for security
+		if ( ! isset( $_POST['wp360_images_nonce'] ) || ! wp_verify_nonce( $_POST['wp360_images_nonce'], 'wp360_save_images' ) ) {
+			return;
+		}
+
+		// Prevent saving during autosave
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+
+		// Check user permissions
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+
+		// Save the meta data
+		if ( isset( $_POST['wp360_images'] ) ) {
+			$images_val = sanitize_text_field( wp_unslash( $_POST['wp360_images'] ) );
+			update_post_meta( $post_id, 'wp360_images', $images_val );
+		}
 	}
 
 }
