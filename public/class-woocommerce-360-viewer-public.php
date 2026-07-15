@@ -128,16 +128,21 @@ class Woocommerce_360_Viewer_Public {
 		$auto_spin = get_option('wp360_auto_spin', 0);
 		$spin_speed = get_option('wp360_speed', 80);
 
-		ob_start(); ?>
+		ob_start(); 
 
-		<div class="wp360-container"
-			 data-images='<?php echo json_encode($images); ?>'
-			 data-auto-spin='<?php echo esc_attr($auto_spin); ?>'
-			 data-spin-speed='<?php echo esc_attr($spin_speed); ?>'>
-			<p>360 Viewer Loading...</p>
-		</div>
+		// Try to find the template in the theme first, fallback to the plugin template
+		$template_name = 'shortcode-template.php';
+		$template_path = locate_template( 'wp-360-viewer/' . $template_name );
+		
+		if ( ! $template_path ) {
+			$template_path = plugin_dir_path( dirname( __FILE__ ) ) . 'templates/' . $template_name;
+		}
 
-		<?php return ob_get_clean();
+		if ( file_exists( $template_path ) ) {
+			include $template_path;
+		}
+
+		return ob_get_clean();
 	}
 
 	/**
