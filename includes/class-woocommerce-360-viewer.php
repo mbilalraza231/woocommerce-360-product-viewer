@@ -1,19 +1,6 @@
 <?php
 
 /**
- * The file that defines the core plugin class
- *
- * A class definition that includes attributes and functions used across both the
- * public-facing side of the site and the admin area.
- *
- * @link       https://_
- * @since      1.0.0
- *
- * @package    Woocommerce_360_Viewer
- * @subpackage Woocommerce_360_Viewer/includes
- */
-
-/**
  * The core plugin class.
  *
  * This is used to define internationalization, admin-specific hooks, and
@@ -67,12 +54,9 @@ class Woocommerce_360_Viewer {
 	 * @since    1.0.0
 	 */
 	public function __construct() {
-		if ( defined( 'WOOCOMMERCE_360_VIEWER_VERSION' ) ) {
-			$this->version = WOOCOMMERCE_360_VIEWER_VERSION;
-		} else {
-			$this->version = '1.0.0';
-		}
-		$this->plugin_name = 'woocommerce-360-viewer';
+
+		$this->plugin_name = Woocommerce_360_Viewer_Config::PLUGIN_NAME;
+		$this->version     = Woocommerce_360_Viewer_Config::PLUGIN_VERSION;
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -86,41 +70,67 @@ class Woocommerce_360_Viewer {
 	 *
 	 * Include the following files that make up the plugin:
 	 *
-	 * - Woocommerce_360_Viewer_Loader. Orchestrates the hooks of the plugin.
-	 * - Woocommerce_360_Viewer_i18n. Defines internationalization functionality.
-	 * - Woocommerce_360_Viewer_Admin. Defines all hooks for the admin area.
-	 * - Woocommerce_360_Viewer_Public. Defines all hooks for the public side of the site.
-	 *
-	 * Create an instance of the loader which will be used to register the hooks
-	 * with WordPress.
+	 * - Config:       Central constants.
+	 * - Loader:       Orchestrates the hooks of the plugin.
+	 * - i18n:         Defines internationalization functionality.
+	 * - Log:          Debug and error logging utility.
+	 * - Settings:     Handles plugin settings registration.
+	 * - Admin:        Defines all hooks for the admin area.
+	 * - Frontend:     Defines all hooks for the public side of the site.
+	 * - Shortcode:    Handles the [wp360] shortcode.
+	 * - ProductDetail: Handles WooCommerce single product page integration.
 	 *
 	 * @since    1.0.0
 	 * @access   private
 	 */
 	private function load_dependencies() {
 
-		/**
-		 * The class responsible for orchestrating the actions and filters of the
-		 * core plugin.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woocommerce-360-viewer-loader.php';
+		$plugin_path = plugin_dir_path( dirname( __FILE__ ) );
 
 		/**
-		 * The class responsible for defining internationalization functionality
-		 * of the plugin.
+		 * Config — central constants.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woocommerce-360-viewer-i18n.php';
+		require_once $plugin_path . 'includes/config/class-woocommerce-360-viewer-config.php';
 
 		/**
-		 * The class responsible for defining all actions that occur in the admin area.
+		 * Helper — hook loader.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-woocommerce-360-viewer-admin.php';
+		require_once $plugin_path . 'includes/helper/class-woocommerce-360-viewer-loader.php';
 
 		/**
-		 * The class responsible for defining all actions that occur in the public-facing
-		 * side of the site.
+		 * Helper — debug/error logger.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-woocommerce-360-viewer-public.php';
+		require_once $plugin_path . 'includes/helper/class-woocommerce-360-viewer-log.php';
+
+		/**
+		 * Core — internationalization.
+		 */
+		require_once $plugin_path . 'includes/core/class-woocommerce-360-viewer-i18n.php';
+
+		/**
+		 * Admin — settings registration.
+		 */
+		require_once $plugin_path . 'includes/admin/class-woocommerce-360-viewer-settings.php';
+
+		/**
+		 * Admin — admin area hooks and UI.
+		 */
+		require_once $plugin_path . 'admin/class-woocommerce-360-viewer-admin.php';
+
+		/**
+		 * Frontend — public-facing asset enqueues.
+		 */
+		require_once $plugin_path . 'includes/frontend/class-woocommerce-360-viewer-frontend.php';
+
+		/**
+		 * Frontend — shortcode rendering.
+		 */
+		require_once $plugin_path . 'includes/frontend/class-woocommerce-360-viewer-shortcode.php';
+
+		/**
+		 * Frontend — WooCommerce product page integration.
+		 */
+		require_once $plugin_path . 'includes/frontend/class-woocommerce-360-viewer-product-detail.php';
 
 		$this->loader = new Woocommerce_360_Viewer_Loader();
 
@@ -152,12 +162,13 @@ class Woocommerce_360_Viewer {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Woocommerce_360_Viewer_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin    = new Woocommerce_360_Viewer_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_settings = new Woocommerce_360_Viewer_Settings();
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_settings_page' );
-		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
+		$this->loader->add_action( 'admin_init', $plugin_settings, 'register_settings' );
 
 	}
 
@@ -170,12 +181,19 @@ class Woocommerce_360_Viewer {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Woocommerce_360_Viewer_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_frontend       = new Woocommerce_360_Viewer_Frontend( $this->get_plugin_name(), $this->get_version() );
+		$plugin_shortcode      = new Woocommerce_360_Viewer_Shortcode();
+		$plugin_product_detail = new Woocommerce_360_Viewer_Product_Detail();
 
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-		$this->loader->add_shortcode( 'wp360', $plugin_public, 'render_shortcode' );
-		$this->loader->add_action( 'woocommerce_before_single_product_summary', $plugin_public, 'show_on_product', 20 );
+		// Frontend assets
+		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_frontend, 'enqueue_styles' );
+		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_frontend, 'enqueue_scripts' );
+
+		// Shortcode
+		$this->loader->add_shortcode( 'wp360', $plugin_shortcode, 'render_shortcode' );
+
+		// WooCommerce product page
+		$this->loader->add_action( 'woocommerce_before_single_product_summary', $plugin_product_detail, 'show_on_product', 20 );
 
 	}
 

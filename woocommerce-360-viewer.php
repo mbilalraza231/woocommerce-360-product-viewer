@@ -31,27 +31,27 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Currently plugin version.
- * Start at version 1.0.0 and use SemVer - https://semver.org
- * Rename this for your plugin and update it as you release new versions.
+ * Plugin constants — used throughout the codebase for clean path resolution.
  */
 define( 'WOOCOMMERCE_360_VIEWER_VERSION', '1.0.0' );
+define( 'WP360_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'WP360_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
 /**
  * The code that runs during plugin activation.
- * This action is documented in includes/class-woocommerce-360-viewer-activator.php
+ * This action is documented in includes/core/class-woocommerce-360-viewer-activator.php
  */
 function activate_woocommerce_360_viewer() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-woocommerce-360-viewer-activator.php';
+	require_once WP360_PLUGIN_DIR . 'includes/core/class-woocommerce-360-viewer-activator.php';
 	Woocommerce_360_Viewer_Activator::activate();
 }
 
 /**
  * The code that runs during plugin deactivation.
- * This action is documented in includes/class-woocommerce-360-viewer-deactivator.php
+ * This action is documented in includes/core/class-woocommerce-360-viewer-deactivator.php
  */
 function deactivate_woocommerce_360_viewer() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-woocommerce-360-viewer-deactivator.php';
+	require_once WP360_PLUGIN_DIR . 'includes/core/class-woocommerce-360-viewer-deactivator.php';
 	Woocommerce_360_Viewer_Deactivator::deactivate();
 }
 
@@ -59,10 +59,15 @@ register_activation_hook( __FILE__, 'activate_woocommerce_360_viewer' );
 register_deactivation_hook( __FILE__, 'deactivate_woocommerce_360_viewer' );
 
 /**
+ * Load the Config class first — it provides constants to every other class.
+ */
+require WP360_PLUGIN_DIR . 'includes/config/class-woocommerce-360-viewer-config.php';
+
+/**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-woocommerce-360-viewer.php';
+require WP360_PLUGIN_DIR . 'includes/class-woocommerce-360-viewer.php';
 
 /**
  * Begins execution of the plugin.

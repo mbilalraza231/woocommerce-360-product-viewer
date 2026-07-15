@@ -13,8 +13,11 @@
 /**
  * The admin-specific functionality of the plugin.
  *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the admin-specific stylesheet and JavaScript.
+ * Defines the plugin name, version, and hooks for the admin-specific
+ * stylesheet, JavaScript, and settings page.
+ *
+ * Settings registration has been extracted to:
+ * includes/admin/class-woocommerce-360-viewer-settings.php
  *
  * @package    Woocommerce_360_Viewer
  * @subpackage Woocommerce_360_Viewer/admin
@@ -61,19 +64,13 @@ class Woocommerce_360_Viewer_Admin {
 	 */
 	public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Woocommerce_360_Viewer_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Woocommerce_360_Viewer_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/woocommerce-360-viewer-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style(
+			$this->plugin_name . '-admin',
+			WP360_PLUGIN_URL . 'css/woocommerce-360-viewer-admin.css',
+			array(),
+			$this->version,
+			'all'
+		);
 
 	}
 
@@ -84,19 +81,13 @@ class Woocommerce_360_Viewer_Admin {
 	 */
 	public function enqueue_scripts() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Woocommerce_360_Viewer_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Woocommerce_360_Viewer_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/woocommerce-360-viewer-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script(
+			$this->plugin_name . '-admin',
+			WP360_PLUGIN_URL . 'js/woocommerce-360-viewer-admin.js',
+			array( 'jquery' ),
+			$this->version,
+			false
+		);
 
 	}
 
@@ -123,25 +114,7 @@ class Woocommerce_360_Viewer_Admin {
 	 * @since    1.0.0
 	 */
 	public function display_plugin_settings_page() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/woocommerce-360-viewer-admin-display.php';
-	}
-
-	/**
-	 * Register the settings for this plugin.
-	 *
-	 * @since    1.0.0
-	 */
-	public function register_settings() {
-		register_setting( 'wp360_settings_group', 'wp360_auto_spin' );
-		register_setting( 'wp360_settings_group', 'wp360_drag_rotation' );
-		register_setting( 'wp360_settings_group', 'wp360_speed' );
-		register_setting( 'wp360_settings_group', 'wp360_show_controls' );
-		register_setting( 'wp360_settings_group', 'wp360_zoom_enable' );
-		register_setting( 'wp360_settings_group', 'wp360_zoom_on_hover' );
-		register_setting( 'wp360_settings_group', 'wp360_zoom_on_click' );
-		register_setting( 'wp360_settings_group', 'wp360_zoom_level' );
-		register_setting( 'wp360_settings_group', 'wp360_inertia' );
-		register_setting( 'wp360_settings_group', 'wp360_hotspots' );
+		require_once WP360_PLUGIN_DIR . 'admin/partials/woocommerce-360-viewer-admin-display.php';
 	}
 
 }
